@@ -122,7 +122,8 @@ To retry an unpublished release without changing its tag, run the workflow manua
 from `main` and supply the existing tag in the `tag` input.
 
 Publishing uses NuGet trusted publishing with the GitHub environment `production`.
-Set its `NUGET_USER` variable to the NuGet account that owns the trust policy.
+Set its `NUGET_USER` variable to the personal NuGet username that created the trust
+policy, even when the policy is owned by an organization.
 The NuGet policy must allow repository owner `Eleven19`, repository `ion-dotnet`,
 workflow file `release.yaml`, and environment `production`.
 No AWS signing service or long-lived NuGet API key is required.
