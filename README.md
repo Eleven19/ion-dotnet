@@ -111,6 +111,20 @@ you can build the project simply by:
 $ dotnet build
 ```
 
+## Publishing
+
+Releases of `Eleven19.IonDotnet` are published to NuGet.org by
+`.github/workflows/release.yaml`. Update `<Version>` in
+`Eleven19.IonDotnet/Eleven19.IonDotnet.csproj`, merge the change into `main`,
+then push a matching tag, for example `v0.1.0`.
+The workflow checks the version, builds, runs the tests, and publishes the package.
+
+Publishing uses NuGet trusted publishing with the GitHub environment `production`.
+Set its `NUGET_USER` variable to the NuGet account that owns the trust policy.
+The NuGet policy must allow repository owner `Eleven19`, repository `ion-dotnet`,
+workflow file `release.yaml`, and environment `production`.
+No AWS signing service or long-lived NuGet API key is required.
+
 ## License
 
 This library is licensed under the MIT License.

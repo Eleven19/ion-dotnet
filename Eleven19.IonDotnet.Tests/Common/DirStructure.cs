@@ -13,7 +13,6 @@
  * permissions and limitations under the License.
  */
 
-using System;
 using System.IO;
 
 namespace Eleven19.IonDotnet.Tests.Common
@@ -23,12 +22,12 @@ namespace Eleven19.IonDotnet.Tests.Common
         private static DirectoryInfo GetRootDir()
         {
             var dirInfo = new DirectoryInfo(Directory.GetCurrentDirectory());
-            while (!string.Equals(dirInfo.Name, "ion-dotnet", StringComparison.OrdinalIgnoreCase))
+            while (dirInfo != null && !File.Exists(Path.Combine(dirInfo.FullName, "Eleven19.IonDotnet.sln")))
             {
-                dirInfo = Directory.GetParent(dirInfo.FullName);
+                dirInfo = dirInfo.Parent;
             }
 
-            return dirInfo;
+            return dirInfo ?? throw new DirectoryNotFoundException("Could not find Eleven19.IonDotnet.sln.");
         }
 
         private static DirectoryInfo TestDatDir()
