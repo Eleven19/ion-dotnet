@@ -118,6 +118,8 @@ Releases of `Eleven19.IonDotnet` are published to NuGet.org by
 `Eleven19.IonDotnet/Eleven19.IonDotnet.csproj`, merge the change into `main`,
 then push a matching tag, for example `v0.1.0`.
 The workflow checks the version, builds, runs the tests, and publishes the package.
+To retry an unpublished release without changing its tag, run the workflow manually
+from `main` and supply the existing tag in the `tag` input.
 
 Publishing uses NuGet trusted publishing with the GitHub environment `production`.
 Set its `NUGET_USER` variable to the NuGet account that owns the trust policy.
