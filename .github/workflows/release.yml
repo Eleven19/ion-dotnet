@@ -88,6 +88,7 @@ jobs:
               }
               Write-Host "Publishing $id $version"
             } finally { $archive.Dispose() }
+          }
       - name: Show trusted publishing identity
         uses: actions/github-script@v7
         with:
