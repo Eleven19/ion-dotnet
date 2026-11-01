@@ -65,6 +65,16 @@ jobs:
         run: dotnet build Eleven19.IonDotnet/Eleven19.IonDotnet.csproj --configuration Release
       - name: Pack
         run: dotnet pack Eleven19.IonDotnet/Eleven19.IonDotnet.csproj --configuration Release --no-build --output artifacts
+      - name: Show trusted publishing identity
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('https://www.nuget.org');
+            const claims = JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString());
+            const fields = ['repository', 'repository_id', 'repository_owner', 'repository_owner_id', 'job_workflow_ref', 'environment', 'event_name'];
+            for (const field of fields) {
+              core.info(`${field}: ${claims[field] ?? '(absent)'}`);
+            }
       - name: NuGet login
         uses: NuGet/login@v1
         id: login
