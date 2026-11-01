@@ -114,7 +114,7 @@ $ dotnet build
 ## Publishing
 
 Releases of `Eleven19.IonDotnet` are published to NuGet.org by
-`.github/workflows/release.yaml`. Update `<Version>` in
+`.github/workflows/release.yml`. Update `<Version>` in
 `Eleven19.IonDotnet/Eleven19.IonDotnet.csproj`, merge the change into `main`,
 then push a matching tag, for example `v0.1.0`.
 The workflow checks the version, builds, runs the tests, and publishes the package.
@@ -125,9 +125,10 @@ Publishing uses NuGet trusted publishing with the GitHub environment `production
 Set its `NUGET_USER` variable to the personal NuGet username that created the trust
 policy, even when the policy is owned by an organization.
 The NuGet policy must allow repository owner `Eleven19`, repository `ion-dotnet`,
-workflow file `release.yaml`, and environment `production`.
+workflow file `release.yml`, and environment `production`.
 No AWS signing service or long-lived NuGet API key is required.
 
 ## License
 
 This library is licensed under the MIT License.
+

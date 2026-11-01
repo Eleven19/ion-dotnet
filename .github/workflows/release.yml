@@ -65,6 +65,29 @@ jobs:
         run: dotnet build Eleven19.IonDotnet/Eleven19.IonDotnet.csproj --configuration Release
       - name: Pack
         run: dotnet pack Eleven19.IonDotnet/Eleven19.IonDotnet.csproj --configuration Release --no-build --output artifacts
+      - name: Check package identity
+        shell: pwsh
+        run: |
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $packages = @(Get-ChildItem artifacts/*.nupkg)
+          if ($packages.Count -eq 0) { throw 'No packages were produced.' }
+          foreach ($package in $packages) {
+            $archive = [System.IO.Compression.ZipFile]::OpenRead($package.FullName)
+            try {
+              $nuspec = @($archive.Entries | Where-Object { $_.FullName -like '*.nuspec' })
+              if ($nuspec.Count -ne 1) { throw "Expected one nuspec in $($package.Name)." }
+              $reader = [System.IO.StreamReader]::new($nuspec[0].Open())
+              try { [xml]$manifest = $reader.ReadToEnd() } finally { $reader.Dispose() }
+              $id = $manifest.package.metadata.id
+              $version = $manifest.package.metadata.version
+              if (!$id.StartsWith('Eleven19.', [StringComparison]::Ordinal)) {
+                throw "Refusing to publish package ID $id. Expected Eleven19.*."
+              }
+              if ($env:RELEASE_TAG -cne "v$version") {
+                throw "Package version $version does not match $env:RELEASE_TAG."
+              }
+              Write-Host "Publishing $id $version"
+            } finally { $archive.Dispose() }
       - name: Show trusted publishing identity
         uses: actions/github-script@v7
         with:
@@ -81,4 +104,4 @@ jobs:
         with:
           user: ${{ vars.NUGET_USER }}
       - name: Publish to NuGet
-        run: dotnet nuget push artifacts/*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push artifacts/Eleven19.*.nupkg --api-key "${{ steps.login.outputs.NUGET_API_KEY }}" --source https://api.nuget.org/v3/index.json
