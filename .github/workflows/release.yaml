@@ -71,7 +71,7 @@ jobs:
           dotnet build --configuration Release
 
           # Push unsigned DLL to S3 and capture full output
-          put_response=$(aws s3api put-object --bucket "${{ secrets.AWS_UNSIGNED_BUCKET }}" --key "${{ secrets.AWS_KEY }}" --body Amazon.IonDotnet/bin/Release/netstandard2.0/Amazon.IonDotnet.dll --acl bucket-owner-full-control)
+          put_response=$(aws s3api put-object --bucket "${{ secrets.AWS_UNSIGNED_BUCKET }}" --key "${{ secrets.AWS_KEY }}" --body Eleven19.IonDotnet/bin/Release/netstandard2.0/Eleven19.IonDotnet.dll --acl bucket-owner-full-control)
 
           # Extract version ID with raw output
           version_id=$(echo "$put_response" | jq -r '.VersionId')
@@ -102,9 +102,9 @@ jobs:
           aws s3api wait object-exists --bucket "${{ secrets.AWS_SIGNED_BUCKET }}" --key "${{ secrets.AWS_KEY }}-${job_id}"
 
           # Get signed DLL from S3
-          aws s3api get-object --bucket "${{ secrets.AWS_SIGNED_BUCKET }}" --key "${{ secrets.AWS_KEY }}-${job_id}" Amazon.IonDotnet/bin/Release/netstandard2.0/Amazon.IonDotnet.dll
+          aws s3api get-object --bucket "${{ secrets.AWS_SIGNED_BUCKET }}" --key "${{ secrets.AWS_KEY }}-${job_id}" Eleven19.IonDotnet/bin/Release/netstandard2.0/Eleven19.IonDotnet.dll
 
       - name: Publish to NuGet
         run: |
           dotnet pack --configuration Release --no-build
-          dotnet nuget push Amazon.IonDotnet/bin/Release/Amazon.IonDotnet.*.nupkg --api-key "${{ secrets.AWS_NUGET_KEY }}" --source https://api.nuget.org/v3/index.json
+          dotnet nuget push Eleven19.IonDotnet/bin/Release/Eleven19.IonDotnet.*.nupkg --api-key "${{ secrets.AWS_NUGET_KEY }}" --source https://api.nuget.org/v3/index.json

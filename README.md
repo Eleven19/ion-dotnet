@@ -1,11 +1,11 @@
 ## Ion .NET (Deprecated)
 
 [![Build Status](https://github.com/amzn/ion-dotnet/workflows/Ion%20DotNet%20CI/badge.svg)](https://github.com/amzn/ion-dotnet/actions?query=workflow%3A%22Ion+DotNet+CI%22)
-[![nuget version](https://img.shields.io/nuget/v/Amazon.IonDotnet)](https://www.nuget.org/packages/Amazon.IonDotnet)
+[![nuget version](https://img.shields.io/nuget/v/Eleven19.IonDotnet)](https://www.nuget.org/packages/Eleven19.IonDotnet)
 
 As of 8/20/2024, this library is deprecated and will not receive further updates. Users should consider migrating to [other Ion solutions](https://amazon-ion.github.io/ion-docs/libs.html).
 
-Amazon Ion ( http://amzn.github.io/ion-docs/ ) library for .NET
+Eleven19.IonDotnet, a fork of the archived amazon-ion/ion-dotnet. Amazon Ion ( http://amzn.github.io/ion-docs/ ) library for .NET
 
 This package is based on work from Huy Hoang ([dhhoang](https://github.com/dhhoang)) on https://github.com/dhhoang/IonDotnet. The Ion team greatly appreciates Huy's contributions to the Ion community.
 
