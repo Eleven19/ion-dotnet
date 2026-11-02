@@ -43,6 +43,35 @@ namespace Eleven19.IonDotnet.Tests.Internals
         }
 
         [TestMethod]
+        [DataRow(new byte[] { 0xC2 })]
+        [DataRow(new byte[] { 0xE2, 0x82 })]
+        [DataRow(new byte[] { 0xF0, 0x9F, 0x98 })]
+        public void ASequenceCutAtTheEndOfTheInputThrows(byte[] cut)
+        {
+            var data = new[] { (byte)'"', (byte)'a', (byte)'"', (byte)' ' }.Concat(cut).ToArray();
+            using (var reader = IonReaderBuilder.Build(new MemoryStream(data)))
+            {
+                Assert.ThrowsException<IonException>(() =>
+                {
+                    while (reader.MoveNext() != IonType.None)
+                    {
+                    }
+                });
+            }
+        }
+
+        [TestMethod]
+        [DataRow(1)]
+        [DataRow(4096)]
+        public void ACompleteSequenceAtTheEndOfTheInputReads(int padding)
+        {
+            // A comment is the one place Ion text can legally end in a non-ASCII character.
+            var text = new string('a', padding);
+            var data = Encoding.UTF8.GetBytes($"\"{text}\" // 中");
+            Assert.AreEqual(text, ReadStringFrom(data));
+        }
+
+        [TestMethod]
         [DataRow("café")]
         [DataRow("中文")]
         [DataRow("\U0001F600")]
