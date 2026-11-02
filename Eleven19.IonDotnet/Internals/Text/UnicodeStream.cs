@@ -22,9 +22,10 @@ namespace Eleven19.IonDotnet.Internals.Text
 
     internal class UnicodeStream : TextStream
     {
+        private static readonly Encoding StrictUtf8 = new UTF8Encoding(false, true);
+
         private readonly StreamReader streamReader;
-        private readonly Stack<int> unreadStack;
-        private long? remainingChars = null;
+        private readonly Stack<int> unreadStack = new Stack<int>();
 
         public UnicodeStream(Stream inputStream)
             : this(inputStream, Encoding.UTF8)
@@ -38,12 +39,7 @@ namespace Eleven19.IonDotnet.Internals.Text
                 throw new ArgumentException("Input stream must be readable", nameof(inputStream));
             }
 
-            this.streamReader = new StreamReader(inputStream, encoding);
-            this.unreadStack = new Stack<int>();
-            if (inputStream.CanSeek)
-            {
-                this.remainingChars = inputStream.Length;
-            }
+            this.streamReader = new StreamReader(inputStream, Decoding(encoding));
         }
 
         public UnicodeStream(Stream inputStream, Span<byte> readBytes)
@@ -65,15 +61,13 @@ namespace Eleven19.IonDotnet.Internals.Text
                 throw new ArgumentException("Input stream must be readable", nameof(inputStream));
             }
 
-            this.streamReader = new StreamReader(inputStream, encoding);
+            this.streamReader = new StreamReader(inputStream, Decoding(encoding));
             if (inputStream.CanSeek)
             {
-                this.remainingChars = inputStream.Length;
                 this.InputStream.Seek(-readBytes.Length, SeekOrigin.Current);
                 return;
             }
 
-            this.unreadStack = new Stack<int>(readBytes.Length);
             for (var i = readBytes.Length - 1; i >= 0; i--)
             {
                 this.unreadStack.Push(readBytes[i]);
@@ -84,18 +78,19 @@ namespace Eleven19.IonDotnet.Internals.Text
 
         public override int Read()
         {
-            var value = this.unreadStack.Count > 0 ? this.unreadStack.Pop() : this.streamReader.Read();
-
-            if (this.remainingChars.HasValue)
+            if (this.unreadStack.Count > 0)
             {
-                this.remainingChars--;
-                if (this.streamReader.CurrentEncoding == Encoding.UTF8)
-                {
-                    this.IsValidUTF8Character();
-                }
+                return this.unreadStack.Pop();
             }
 
-            return value;
+            try
+            {
+                return this.streamReader.Read();
+            }
+            catch (DecoderFallbackException exception)
+            {
+                throw new IonException("Input stream is not a valid UTF-8 stream.", exception);
+            }
         }
 
         public override void Unread(int c)
@@ -108,12 +103,10 @@ namespace Eleven19.IonDotnet.Internals.Text
             this.unreadStack.Push(c);
         }
 
-        private void IsValidUTF8Character()
-        {
-            if (this.remainingChars > 0 && this.streamReader.Peek() == -1)
-            {
-                throw new IonException("Input stream is not a valid UTF-8 stream.");
-            }
-        }
+        /// <summary>
+        /// Ion text must be valid, so UTF-8 decoding throws instead of substituting replacement characters.
+        /// </summary>
+        private static Encoding Decoding(Encoding encoding) =>
+            encoding.CodePage == Encoding.UTF8.CodePage ? StrictUtf8 : encoding;
     }
 }

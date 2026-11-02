@@ -39,9 +39,23 @@ namespace Eleven19.IonDotnet.Tests.Internals
                 bytes[i] = Convert.ToByte(hexString.Substring(i * 2, 2), 16);
             }
 
+            // 0xFB is not valid UTF-8, so the reader now stops at that byte.
             var stream = new MemoryStream(bytes);
             var textStream = new UnicodeStream(stream);
             scanner = new TextScanner(textStream);
+
+            Assert.ThrowsException<IonException>(() =>
+            {
+                scanner.NextToken();
+                while (scanner.Token != TextConstants.TokenEof)
+                {
+                    scanner.NextToken();
+                }
+            });
+
+            // The same input with that byte replaced still reaches the end of the stream without looping.
+            bytes[Array.IndexOf(bytes, (byte)0xFB)] = (byte)'x';
+            scanner = new TextScanner(new UnicodeStream(new MemoryStream(bytes)));
 
             Assert.ThrowsException<UnexpectedEofException>(() =>
             {
