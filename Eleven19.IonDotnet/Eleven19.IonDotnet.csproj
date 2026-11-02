@@ -4,8 +4,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.3</LangVersion>
     <PackageId>Eleven19.IonDotnet</PackageId>
-    <Version>0.1.0</Version>
-    <Authors>amazon-ion</Authors>
+    <Version>0.1.1</Version>
+    <Authors>Eleven19;amazon-ion;Huy Hoang</Authors>
     <Company>Eleven19</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <RepositoryUrl>https://github.com/Eleven19/ion-dotnet</RepositoryUrl>
@@ -14,7 +14,8 @@
     <PackageTags>ion;amazon;json;serialization;parser</PackageTags>
     <PackageIcon>amazon.png</PackageIcon>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/8594673?s=200&amp;v=4</PackageIconUrl>
-    <PackageLicense>LICENSE.md</PackageLicense>
+    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\public.snk</AssemblyOriginatorKeyFile>
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
@@ -34,6 +35,8 @@
   <ItemGroup>
     <Folder Include="Tree\Impl\" />
     <None Include="../amazon.png" Pack="true" PackagePath="" />
+    <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="../README.md" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">

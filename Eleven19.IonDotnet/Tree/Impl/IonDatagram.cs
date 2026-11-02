@@ -28,12 +28,6 @@ namespace Eleven19.IonDotnet.Tree.Impl
         {
         }
 
-        /// <inheritdoc />
-        /// <summary>
-        /// Use strict reference equality for datagram.
-        /// </summary>
-        public override bool IsEquivalentTo(IIonValue other) => other == this;
-
         public override IonType Type() => IonType.Datagram;
 
         /// <summary>

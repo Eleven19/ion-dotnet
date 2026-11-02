@@ -1,11 +1,12 @@
-## Ion .NET (Deprecated)
+## Eleven19.IonDotnet
 
-[![Build Status](https://github.com/amzn/ion-dotnet/workflows/Ion%20DotNet%20CI/badge.svg)](https://github.com/amzn/ion-dotnet/actions?query=workflow%3A%22Ion+DotNet+CI%22)
+[![Build Status](https://github.com/Eleven19/ion-dotnet/actions/workflows/build.yml/badge.svg)](https://github.com/Eleven19/ion-dotnet/actions/workflows/build.yml)
 [![nuget version](https://img.shields.io/nuget/v/Eleven19.IonDotnet)](https://www.nuget.org/packages/Eleven19.IonDotnet)
 
-As of 8/20/2024, this library is deprecated and will not receive further updates. Users should consider migrating to [other Ion solutions](https://amazon-ion.github.io/ion-docs/libs.html).
-
-Eleven19.IonDotnet, a fork of the archived amazon-ion/ion-dotnet. Amazon Ion ( http://amzn.github.io/ion-docs/ ) library for .NET
+Eleven19.IonDotnet is the Eleven19-maintained fork of the archived amazon-ion/ion-dotnet
+library for reading and writing Amazon Ion in .NET. Amazon deprecated the upstream
+library in August 2024; development continues here under the `Eleven19.IonDotnet`
+package and namespace.
 
 This package is based on work from Huy Hoang ([dhhoang](https://github.com/dhhoang)) on https://github.com/dhhoang/IonDotnet. The Ion team greatly appreciates Huy's contributions to the Ion community.
 
@@ -130,5 +131,8 @@ No AWS signing service or long-lived NuGet API key is required.
 
 ## License
 
-This library is licensed under the MIT License.
+The original Huy Hoang code and Eleven19 contributions carry MIT notices.
+Amazon contributions carry an Apache 2.0 notice. See [LICENSE.md](LICENSE.md)
+for the preserved copyright notices and licence terms. The NuGet package includes
+this file as its licence metadata.
 

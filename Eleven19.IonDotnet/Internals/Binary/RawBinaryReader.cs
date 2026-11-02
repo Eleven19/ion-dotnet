@@ -61,6 +61,8 @@ namespace Eleven19.IonDotnet.Internals.Binary
         private const int BinaryVersionMarkerTid = (0xE0 & 0xff) >> 4;
         private const int BinaryVersionMarkerLen = 0xE0 & 0xff & 0xf;
 
+        private static readonly Encoding StrictUtf8 = new UTF8Encoding(false, true);
+
         private readonly Stream input;
 
         /// <summary>
@@ -655,9 +657,19 @@ namespace Eleven19.IonDotnet.Internals.Binary
         /// </summary>
         /// <param name="length">Length of the string representation in bytes.</param>
         /// <returns>Read string.</returns>
-        protected string ReadString(int length) => length <= BinaryConstants.ShortStringLength
-            ? this.ReadShortString(length)
-            : this.ReadLongString(length);
+        protected string ReadString(int length)
+        {
+            try
+            {
+                return length <= BinaryConstants.ShortStringLength
+                    ? this.ReadShortString(length)
+                    : this.ReadLongString(length);
+            }
+            catch (DecoderFallbackException exception)
+            {
+                throw new IonException("Invalid UTF-8 in binary Ion string.", exception);
+            }
+        }
 
         private static IonType GetIonTypeFromCode(int tid)
         {
@@ -1142,18 +1154,22 @@ namespace Eleven19.IonDotnet.Internals.Binary
             Span<byte> alloc = stackalloc byte[BinaryConstants.ShortStringLength];
             this.ReadAll(alloc, length);
             ReadOnlySpan<byte> readOnlySpan = alloc;
-            var strValue = Encoding.UTF8.GetString(readOnlySpan.Slice(0, length));
+            var strValue = StrictUtf8.GetString(readOnlySpan.Slice(0, length));
             return strValue;
         }
 
         private string ReadLongString(int length)
         {
             var alloc = ArrayPool<byte>.Shared.Rent(length);
-            this.ReadAll(new ArraySegment<byte>(alloc, 0, length), length);
-
-            var strValue = Encoding.UTF8.GetString(alloc, 0, length);
-            ArrayPool<byte>.Shared.Return(alloc);
-            return strValue;
+            try
+            {
+                this.ReadAll(new ArraySegment<byte>(alloc, 0, length), length);
+                return StrictUtf8.GetString(alloc, 0, length);
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.Return(alloc);
+            }
         }
 
         /// <summary>

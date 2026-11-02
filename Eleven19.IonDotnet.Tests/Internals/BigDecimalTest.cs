@@ -26,6 +26,19 @@ namespace Eleven19.IonDotnet.Tests.Internals
     [TestClass]
     public class BigDecimalTest
     {
+        [TestMethod]
+        [DataRow("123456789012345678901234567890.1200", "1234567890123456789012345678901200", 4, false)]
+        [DataRow("-12.3400", "-123400", 4, false)]
+        [DataRow("12d3", "12", -3, false)]
+        [DataRow("-0.00", "0", 2, true)]
+        public void PublicComponentsPreserveExactRepresentation(string text, string coefficient, int scale, bool negativeZero)
+        {
+            var value = BigDecimal.Parse(text);
+            Assert.AreEqual(BigInteger.Parse(coefficient, CultureInfo.InvariantCulture), value.Coefficient);
+            Assert.AreEqual(scale, value.Scale);
+            Assert.AreEqual(negativeZero, value.IsNegativeZero);
+        }
+
         public static IEnumerable<object[]> Decimals_DecimalPlaces()
         {
             return new List<object[]>

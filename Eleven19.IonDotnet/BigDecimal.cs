@@ -32,7 +32,6 @@ namespace Eleven19.IonDotnet
 
         public readonly bool IsNegativeZero;
         internal readonly BigInteger IntVal;
-        internal readonly int Scale;
 
         private static readonly BigInteger DecimalMaxValue = new BigInteger(decimal.MaxValue);
 
@@ -65,6 +64,17 @@ namespace Eleven19.IonDotnet
             this.IntVal = negative ? BigInteger.Negate(bi) : bi;
             this.IsNegativeZero = negative && this.IntVal == 0;
         }
+
+        /// <summary>
+        /// Gets the signed integer coefficient. The value is coefficient multiplied by ten to the negative scale.
+        /// </summary>
+        /// <remarks>For negative zero, this is zero; use <see cref="IsNegativeZero"/> to distinguish its sign.</remarks>
+        public BigInteger Coefficient => this.IntVal;
+
+        /// <summary>
+        /// Gets the scale, the negative of the base-ten exponent. Trailing decimal zeros are preserved.
+        /// </summary>
+        public int Scale { get; }
 
         public static bool operator >(BigDecimal a, BigDecimal b)
         {
