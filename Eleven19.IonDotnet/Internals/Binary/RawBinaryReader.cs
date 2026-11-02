@@ -413,7 +413,7 @@ namespace Eleven19.IonDotnet.Internals.Binary
                 return new BigDecimal(0m);
             }
 
-            var saveLimit = this.localRemaining - length;
+            var saveLimit = this.localRemaining == NoLimit ? NoLimit : this.localRemaining - length;
             this.localRemaining = length;
 
             this.ReadVarInt(out var exponent);
@@ -463,7 +463,7 @@ namespace Eleven19.IonDotnet.Internals.Binary
                 return 0m;
             }
 
-            var saveLimit = this.localRemaining - length;
+            var saveLimit = this.localRemaining == NoLimit ? NoLimit : this.localRemaining - length;
             this.localRemaining = length;
 
             this.ReadVarInt(out var exponent);
@@ -538,7 +538,7 @@ namespace Eleven19.IonDotnet.Internals.Binary
             int month = 0, day = 0, hour = 0, minute = 0, second = 0;
             decimal frac = 0;
 
-            var saveLimit = this.localRemaining - length;
+            var saveLimit = this.localRemaining == NoLimit ? NoLimit : this.localRemaining - length;
             this.localRemaining = length; // > 0
 
             var offsetKnown = this.ReadVarInt(out var offset);
@@ -848,32 +848,23 @@ namespace Eleven19.IonDotnet.Internals.Binary
                 throw new ArgumentException(nameof(length));
             }
 
-            if (this.localRemaining == NoLimit)
+            if (this.localRemaining != NoLimit && length > this.localRemaining)
             {
-                for (var i = 0; i < length; i++)
-                {
-                    this.input.ReadByte();
-                }
-
-                return;
-            }
-
-            if (length > this.localRemaining)
-            {
-                if (this.localRemaining < 1)
-                {
-                    throw new UnexpectedEofException();
-                }
-
-                length = this.localRemaining;
+                throw new UnexpectedEofException();
             }
 
             for (var i = 0; i < length; i++)
             {
-                this.input.ReadByte();
+                if (this.input.ReadByte() < 0)
+                {
+                    throw new UnexpectedEofException();
+                }
             }
 
-            this.localRemaining -= length;
+            if (this.localRemaining != NoLimit)
+            {
+                this.localRemaining -= length;
+            }
         }
 
         private int ReadFieldId() => this.ReadVarUintOrEof(out var i) < 0 ? BinaryConstants.Eof : i;
@@ -943,6 +934,12 @@ namespace Eleven19.IonDotnet.Internals.Binary
                 {
                     len = this.ReadVarUint();
                 }
+            }
+
+            // A value cannot be longer than what remains of the container that holds it.
+            if (this.localRemaining != NoLimit && len > this.localRemaining)
+            {
+                throw new UnexpectedEofException();
             }
 
             this.valueTid = tid;
@@ -1192,7 +1189,10 @@ namespace Eleven19.IonDotnet.Internals.Binary
 
                 length -= amount;
                 bufferSpan = bufferSpan.Slice(amount);
-                this.localRemaining -= amount;
+                if (this.localRemaining != NoLimit)
+                {
+                    this.localRemaining -= amount;
+                }
             }
         }
 
@@ -1206,6 +1206,15 @@ namespace Eleven19.IonDotnet.Internals.Binary
                 }
 
                 this.localRemaining--;
+
+                // The container says more bytes follow, so the end of the input here means it was cut.
+                var value = this.input.ReadByte();
+                if (value < 0)
+                {
+                    throw new UnexpectedEofException();
+                }
+
+                return value;
             }
 
             return this.input.ReadByte();
@@ -1213,22 +1222,13 @@ namespace Eleven19.IonDotnet.Internals.Binary
 
         private int ReadBytesIntoBuffer(Span<byte> buffer, int length)
         {
-            if (this.localRemaining == NoLimit)
+            if (this.localRemaining != NoLimit && length > this.localRemaining)
             {
-                return this.input.Read(buffer);
+                throw new UnexpectedEofException();
             }
 
-            if (length > this.localRemaining)
-            {
-                if (this.localRemaining < 1)
-                {
-                    throw new UnexpectedEofException();
-                }
-            }
-
-            var bytesRead = this.input.Read(buffer);
-            this.localRemaining -= bytesRead;
-            return bytesRead;
+            this.ReadAll(buffer, length);
+            return length;
         }
 
         private DateTimeKind GetOffsetKind(Timestamp.Precision precision, bool offsetKnown, ref int offset)

@@ -108,7 +108,19 @@ namespace Eleven19.IonDotnet.Builders
 
             // This is the dumbed down implementation
             Span<byte> initialBytes = stackalloc byte[BinaryConstants.BinaryVersionMarkerLength];
-            var bytesRead = stream.Read(initialBytes);
+            var bytesRead = 0;
+            while (bytesRead < initialBytes.Length)
+            {
+                // A stream may return fewer bytes than asked for without being at its end.
+                var amount = stream.Read(initialBytes.Slice(bytesRead));
+                if (amount == 0)
+                {
+                    break;
+                }
+
+                bytesRead += amount;
+            }
+
             var didSeek = stream.CanSeek;
             if (didSeek)
             {
