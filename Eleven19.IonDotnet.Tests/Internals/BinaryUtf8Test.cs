@@ -1,3 +1,6 @@
+// Copyright 2026 Eleven19
+// SPDX-License-Identifier: Apache-2.0
+
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

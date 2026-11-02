@@ -131,8 +131,9 @@ No AWS signing service or long-lived NuGet API key is required.
 
 ## License
 
-The original Huy Hoang code and Eleven19 contributions carry MIT notices.
-Amazon contributions carry an Apache 2.0 notice. See [LICENSE.md](LICENSE.md)
-for the preserved copyright notices and licence terms. The NuGet package includes
-this file as its licence metadata.
+This project is licensed under the [Apache License, Version 2.0](LICENSE.md).
+See [NOTICE](NOTICE) for attribution to Eleven19, Amazon, and Huy Hoang.
+The inherited MIT notice for Huy Hoang's original code is preserved in
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+NuGet packages declare `Apache-2.0` and include all three files.
 

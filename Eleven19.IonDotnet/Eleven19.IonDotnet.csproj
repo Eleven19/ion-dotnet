@@ -4,7 +4,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>7.3</LangVersion>
     <PackageId>Eleven19.IonDotnet</PackageId>
-    <Version>0.1.1</Version>
+    <Version>0.1.2</Version>
     <Authors>Eleven19;amazon-ion;Huy Hoang</Authors>
     <Company>Eleven19</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -14,7 +14,7 @@
     <PackageTags>ion;amazon;json;serialization;parser</PackageTags>
     <PackageIcon>amazon.png</PackageIcon>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/8594673?s=200&amp;v=4</PackageIconUrl>
-    <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\public.snk</AssemblyOriginatorKeyFile>
@@ -36,6 +36,8 @@
     <Folder Include="Tree\Impl\" />
     <None Include="../amazon.png" Pack="true" PackagePath="" />
     <None Include="../LICENSE.md" Pack="true" PackagePath="" />
+    <None Include="../NOTICE" Pack="true" PackagePath="" />
+    <None Include="../THIRD_PARTY_NOTICES.md" Pack="true" PackagePath="" />
     <None Include="../README.md" Pack="true" PackagePath="" />
   </ItemGroup>
   <ItemGroup>

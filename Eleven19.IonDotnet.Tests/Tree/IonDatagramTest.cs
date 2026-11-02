@@ -1,3 +1,6 @@
+// Copyright 2026 Eleven19
+// SPDX-License-Identifier: Apache-2.0
+
 using Eleven19.IonDotnet.Builders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
