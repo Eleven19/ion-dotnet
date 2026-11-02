@@ -33,6 +33,9 @@ namespace Eleven19.IonDotnet.Internals.Text
     /// </remarks>
     internal sealed class TextScanner
     {
+        private const int MaxBmpCodePoint = 0xFFFF;
+        private const int MaxCodePoint = 0x10FFFF;
+
         private readonly TextStream input;
 
         public TextScanner(TextStream input)
@@ -289,6 +292,13 @@ namespace Eleven19.IonDotnet.Internals.Text
                         break;
                 }
 
+                // An escape can name a character beyond the 16-bit range, which needs two UTF-16 units.
+                if (c > MaxBmpCodePoint)
+                {
+                    sb.Append(char.ConvertFromUtf32(c));
+                    continue;
+                }
+
                 if (!isClob)
                 {
                     if (char.IsHighSurrogate((char)c))
@@ -296,7 +306,7 @@ namespace Eleven19.IonDotnet.Internals.Text
                         sb.Append((char)c);
                         c = this.ReadChar();
                         c = this.ReadEscapedChar(c, isClob);
-                        if (!char.IsLowSurrogate((char)c))
+                        if (c > MaxBmpCodePoint || !char.IsLowSurrogate((char)c))
                         {
                             throw new IonException($"Invalid character format {(char)c}");
                         }
@@ -375,13 +385,20 @@ namespace Eleven19.IonDotnet.Internals.Text
                         break;
                 }
 
+                // An escape can name a character beyond the 16-bit range, which needs two UTF-16 units.
+                if (c > MaxBmpCodePoint)
+                {
+                    valueBuffer.Append(char.ConvertFromUtf32(c));
+                    continue;
+                }
+
                 if (!clobCharsOnly)
                 {
                     if (char.IsHighSurrogate((char)c))
                     {
                         valueBuffer.Append((char)c);
                         c = this.ReadChar();
-                        if (!char.IsLowSurrogate((char)c))
+                        if (c > MaxBmpCodePoint || !char.IsLowSurrogate((char)c))
                         {
                             throw new IonException($"Invalid character format {(char)c}");
                         }
@@ -618,6 +635,13 @@ namespace Eleven19.IonDotnet.Internals.Text
                         continue;
                 }
 
+                // An escape can name a character beyond the 16-bit range, which needs two UTF-16 units.
+                if (c > MaxBmpCodePoint)
+                {
+                    sb.Append(char.ConvertFromUtf32(c));
+                    continue;
+                }
+
                 // if this isn't a clob we need to decode UTF8 and
                 // handle surrogate encoding (otherwise we don't care)
                 if (!isClob)
@@ -626,7 +650,7 @@ namespace Eleven19.IonDotnet.Internals.Text
                     {
                         sb.Append((char)c);
                         c = this.ReadChar();
-                        if (!char.IsLowSurrogate((char)c))
+                        if (c > MaxBmpCodePoint || !char.IsLowSurrogate((char)c))
                         {
                             throw new IonException($"Invalid character format {(char)c}");
                         }
@@ -1699,7 +1723,8 @@ namespace Eleven19.IonDotnet.Internals.Text
 
         private int ReadHexEscapeSequence(int len)
         {
-            var hexchar = 0;
+            // Eight hex digits do not fit in an int, so check the range before narrowing.
+            long hexchar = 0;
             while (len > 0)
             {
                 len--;
@@ -1723,7 +1748,12 @@ namespace Eleven19.IonDotnet.Internals.Text
                 throw new IonException("Hex digit len exceeded maximum");
             }
 
-            return hexchar;
+            if (hexchar > MaxCodePoint)
+            {
+                throw new IonException($"Escape is above the highest Unicode code point: {hexchar:X}");
+            }
+
+            return (int)hexchar;
         }
 
         /// <summary>
